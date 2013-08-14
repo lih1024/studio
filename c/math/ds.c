@@ -279,10 +279,6 @@ void bitree_destroy(bitree_t *tree)
 }
 
 //==============================binary search tree============================
-typedef struct avl_node {
-  void *data;
-  int factor;
-} avl_node_t;
 
 enum AVL_TYPE {
   AVL_BALANCE = 0,
@@ -333,21 +329,21 @@ void avl_rotate(bitree_node_t **root)
 	  *root = leftright;
 	} else if(factor == AVL_LEFT_HEAVY) {
 	  (*root)->left = leftright->right;
-	  ((avl_node_t*)((*root)->data))->factor = AVL_BALANCE;
-	  left->right = leftright->left;
-	  ((avl_node_t*)(left->data))->factor = AVL_RIGHT_HEAVY;
-	  leftright->left = left;
-	  leftright->right = *root;
-	  ((avl_node_t*)(leftright->data))->factor = AVL_LEFT_HEAVY;
-	  *root = leftright;
-	} else if(factor == AVL_RIGHT_HEAVY) {
-	  (*root)->left = leftright->right;
-	  ((avl_node_t*)((*root)->data))->factor = AVL_LEFT_HEAVY;
+	  ((avl_node_t*)((*root)->data))->factor = AVL_RIGHT_HEAVY;
 	  left->right = leftright->left;
 	  ((avl_node_t*)(left->data))->factor = AVL_BALANCE;
 	  leftright->left = left;
 	  leftright->right = *root;
-	  ((avl_node_t*)(leftright->data))->factor = AVL_RIGHT_HEAVY;
+	  ((avl_node_t*)(leftright->data))->factor = AVL_BALANCE;
+	  *root = leftright;
+	} else if(factor == AVL_RIGHT_HEAVY) {
+	  (*root)->left = leftright->right;
+	  ((avl_node_t*)((*root)->data))->factor = AVL_BALANCE;
+	  left->right = leftright->left;
+	  ((avl_node_t*)(left->data))->factor = AVL_LEFT_HEAVY;
+	  leftright->left = left;
+	  leftright->right = *root;
+	  ((avl_node_t*)(leftright->data))->factor = AVL_BALANCE;
 	  *root = leftright;
 	}
       }
@@ -355,52 +351,89 @@ void avl_rotate(bitree_node_t **root)
   } else if(factor < AVL_RIGHT_HEAVY) {
     bitree_node_t *right = (*root)->right;
     if(right != NULL) {
-      factor = ((avl_node_t*)((*root)->data))->factor;
+      factor = ((avl_node_t*)(right->data))->factor;
       if(factor == AVL_RIGHT_HEAVY) {//RR rotate
-	
+	(*root)->right = right->left;
+	((avl_node_t*)((*root)->data))->factor = AVL_BALANCE;
+	right->left = *root;
+	((avl_node_t*)(right->data))->factor = AVL_BALANCE;
+	*root = right;
       } else if(factor == AVL_LEFT_HEAVY) {//RL rotate
-	
+	bitree_node_t *rightleft = right->left;
+	factor = ((avl_node_t*)(rightleft->data))->factor;
+	if(factor == AVL_BALANCE) {
+	  (*root)->right = rightleft->left;
+	  ((avl_node_t*)((*root)->data))->factor = AVL_BALANCE;
+	  right->left = rightleft->right;
+	  ((avl_node_t*)(right->data))->factor = AVL_BALANCE;
+	  rightleft->right = right;
+	  rightleft->left = *root;
+	  ((avl_node_t*)(rightleft->data))->factor = AVL_BALANCE;
+	  *root = rightleft;
+	} else if(factor == AVL_LEFT_HEAVY) {
+	  (*root)->right = rightleft->left;
+	  ((avl_node_t*)((*root)->data))->factor = AVL_BALANCE;
+	  right->left = rightleft->right;
+	  ((avl_node_t*)(right->data))->factor = AVL_RIGHT_HEAVY;
+	  rightleft->right = right;
+	  rightleft->left = *root;
+	  ((avl_node_t*)(rightleft->data))->factor = AVL_BALANCE;
+	  *root = rightleft;
+	} else if(factor == AVL_RIGHT_HEAVY) {
+	  (*root)->right = rightleft->left;
+	  ((avl_node_t*)((*root)->data))->factor = AVL_LEFT_HEAVY;
+	  right->left = rightleft->right;
+	  ((avl_node_t*)(right->data))->factor = AVL_BALANCE;
+	  rightleft->right = right;
+	  rightleft->left = *root;
+	  ((avl_node_t*)(rightleft->data))->factor = AVL_BALANCE;
+	  *root = rightleft;
+	}
       }
     }
   }
 }
 
-int bistree_balance_insert(bitree_t *tree, bitree_node_t *parent, void *data, int *balance)
+int bistree_balance_insert(bitree_t *tree, bitree_node_t **parent, void *data, int *balance)
 {
-  int comp = (tree->compare)(data, parent->data);
+  int comp = (tree->compare)(data, (*parent)->data);
   if(comp == 0) {
     return -1;
   } else if(comp > 0) {
-    if(parent->right == NULL) {
-      parent->right = bitree_node_create(data);
-      ((avl_node_t*)(parent->data))->factor += AVL_RIGHT_HEAVY;
-      if(((avl_node_t*)(parent->data))->factor == AVL_RIGHT_HEAVY)
+    if((*parent)->right == NULL) {
+      (*parent)->right = bitree_node_create(data);
+      ((avl_node_t*)((*parent)->data))->factor += AVL_RIGHT_HEAVY;
+      if(((avl_node_t*)((*parent)->data))->factor == AVL_RIGHT_HEAVY)
 	*balance = AVL_RIGHT_HEAVY;
+      else
+	*balance = AVL_BALANCE;
       return 0;
     } else {
-      int ret = bistree_balance_insert(tree, parent->right, data, balance);
+      int ret = bistree_balance_insert(tree, &((*parent)->right), data, balance);
       if(ret == 0 && balance != AVL_BALANCE) {
-	((avl_node_t*)(parent->data))->factor += AVL_RIGHT_HEAVY;
-	if(((avl_node_t*)(parent->data))->factor < AVL_RIGHT_HEAVY) {
-	  avl_rotate(&parent);
+	((avl_node_t*)((*parent)->data))->factor += AVL_RIGHT_HEAVY;
+	if(((avl_node_t*)((*parent)->data))->factor < AVL_RIGHT_HEAVY) {
+	  avl_rotate(parent);
 	  *balance = AVL_BALANCE;
 	}
       }
       return ret;
     }
   } else {
-    if(parent->left == NULL) {
-      parent->left = bitree_node_create(data);
-      ((avl_node_t*)(parent->data))->factor += AVL_LEFT_HEAVY;
-      if(((avl_node_t*)(parent->data))->factor == AVL_LEFT_HEAVY)
+    if((*parent)->left == NULL) {
+      (*parent)->left = bitree_node_create(data);
+      ((avl_node_t*)((*parent)->data))->factor += AVL_LEFT_HEAVY;
+      if(((avl_node_t*)((*parent)->data))->factor == AVL_LEFT_HEAVY)
 	*balance = AVL_LEFT_HEAVY;
+      else
+	*balance = AVL_BALANCE;
       return 0;
     } else {
-      int ret = bistree_balance_insert(tree, parent->left, data, balance);
+      int ret = bistree_balance_insert(tree, &((*parent)->left), data, balance);
       if(ret == 0 && balance != AVL_BALANCE) {
-	((avl_node_t*)(parent->data))->factor += AVL_LEFT_HEAVY;
-	if(((avl_node_t*)(parent->data))->factor > AVL_LEFT_HEAVY) {
-	  avl_rotate(&parent);
+	((avl_node_t*)((*parent)->data))->factor += AVL_LEFT_HEAVY;
+	if(((avl_node_t*)((*parent)->data))->factor > AVL_LEFT_HEAVY) {
+	  avl_rotate(parent);
 	  *balance = AVL_BALANCE;
 	}
       }
@@ -418,7 +451,16 @@ int bistree_insert(bistree_t *tree, void *data)
     return 0;
   } else {
     int balance;
-    return bistree_balance_insert(tree, tree->root, data, &balance);
+    int ret = bistree_balance_insert(tree, &(tree->root), data, &balance);
+    if(ret == 0 && balance != AVL_BALANCE) {
+      /*
+      ((avl_node_t*)(tree->root->data))->factor += AVL_LEFT_HEAVY;
+      if(((avl_node_t*)(tree->root->data))->factor > AVL_LEFT_HEAVY ||
+	 ((avl_node_t*)(tree->root->data))->factor < AVL_RIGHT_HEAVY) {
+	avl_rotate(&(tree->root));
+      }
+      */
+    }
   }
 }
 
