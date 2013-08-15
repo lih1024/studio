@@ -190,6 +190,81 @@ void test_tree()
   bitree_destroy(tree);
 }
 
+void print_bistree_node_inorder(bitree_node_t *node, int nt)
+{
+  if(node == NULL)
+    return ;
+  print_tab(nt);
+  int *dp = (int*)(((avl_node_t*)(node->data))->data);
+  if(dp != NULL) {
+    printf("%d\n", *dp);
+  } else {
+    printf("NULL\n");
+  }
+  if(node->left != NULL)
+    print_bistree_node_inorder(node->left, nt+1);
+  if(node->right != NULL)
+    print_bistree_node_inorder(node->right, nt+1);
+}
+
+void print_bistree(bitree_t *tree)
+{
+  printf("==========tree================\n");
+  print_bistree_node_inorder(tree->root, 0);
+}
+
+int bist_compare_callback(void *key1, void *key2)
+{
+  int *kp1 = (int*)key1;
+  int *kp2 = (int*)key2;
+  return (*kp1 - *kp2);
+}
+
+void bist_destroy_callback(void *data)
+{
+  int *dp = (int*)data;
+  free(dp);
+}
+
+void test_bistree()
+{
+  bistree_t *tree = (bistree_t*)malloc(sizeof(bistree_t));
+  bistree_init(tree, bist_compare_callback, bist_destroy_callback);
+  int i;
+  for(i=10; i > 0; i--) {
+    int *ip = (int*)malloc(sizeof(int));
+    *ip = i;
+    bistree_insert(tree, ip);
+    print_bistree(tree);
+  }
+
+  int a = 1;
+  printf("find %d: %d\n", a, bistree_lookup(tree, &a));
+
+  a = 11;
+  printf("find %d: %d\n", a, bistree_lookup(tree, &a));
+
+  /*
+  int *ap = (int*)malloc(sizeof(int));
+  *ap = 1;
+  bistree_insert(tree, ap);
+  print_bistree(tree);
+  int *bp = (int*)malloc(sizeof(int));
+  *bp = 2;
+  bistree_insert(tree, bp);
+  print_bistree(tree);
+  int *cp = (int*)malloc(sizeof(int));
+  *cp = 3;
+  bistree_insert(tree, cp);
+  print_bistree(tree);
+  int *dp = (int*)malloc(sizeof(int));
+  *dp = 4;
+  bistree_insert(tree, dp);
+  print_bistree(tree);
+  */
+  bistree_destroy(tree);
+}
+
 int main(int argc, char* argv[])
 {
   /*
@@ -198,9 +273,11 @@ int main(int argc, char* argv[])
   test_queue();
 
   test_table();
-  */
-
+ 
   test_tree();
+ */
+
+  test_bistree();
 
   return 0;
 }

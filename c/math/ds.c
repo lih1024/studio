@@ -479,6 +479,18 @@ int bistree_remove(bistree_t *tree, void *data)
 
 int bistree_lookup(bistree_t *tree, void *data)
 {
-
+  bitree_node_t *node = tree->root;
+  int compval;
+  while(node != NULL) {
+    compval = tree->compare(data, ((avl_node_t*)(node->data))->data);
+    if(compval == 0) {
+      return 0;
+    } else if(compval > 0) {
+      node = node->right;
+    } else {
+      node = node->left;
+    }
+  }
+  return -1;
 }
 
