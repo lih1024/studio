@@ -396,7 +396,7 @@ void avl_rotate(bitree_node_t **root)
 
 int bistree_balance_insert(bitree_t *tree, bitree_node_t **parent, void *data, int *balance)
 {
-  int comp = (tree->compare)(data, (*parent)->data);
+  int comp = (tree->compare)(data, ((avl_node_t*)((*parent)->data))->data);
   if(comp == 0) {
     return -1;
   } else if(comp > 0) {

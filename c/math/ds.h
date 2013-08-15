@@ -95,7 +95,11 @@ void bitree_destroy(bitree_t *tree);
 
 //==============================binary search tree============================
 typedef bitree_t bistree_t;
-#define bistree_init(tree, compapre, destroy) (bitree_init(tree, compare, destroy))
+typedef struct avl_node {
+  void *data;
+  int factor;
+} avl_node_t;
+#define bistree_init(tree, compare, destroy) (bitree_init(tree, compare, destroy))
 int bistree_insert(bistree_t *tree, void *data);
 int bistree_remove(bistree_t *tree, void *data);
 int bistree_lookup(bistree_t *tree, void *data);
