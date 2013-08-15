@@ -415,6 +415,10 @@ int bistree_balance_insert(bitree_t *tree, bitree_node_t **parent, void *data, i
 	if(((avl_node_t*)((*parent)->data))->factor < AVL_RIGHT_HEAVY) {
 	  avl_rotate(parent);
 	  *balance = AVL_BALANCE;
+	} else if(((avl_node_t*)((*parent)->data))->factor == AVL_RIGHT_HEAVY) {
+	  *balance = AVL_RIGHT_HEAVY;
+	} else if(((avl_node_t*)((*parent)->data))->factor == AVL_BALANCE) {
+	  *balance = AVL_BALANCE;
 	}
       }
       return ret;
@@ -434,6 +438,10 @@ int bistree_balance_insert(bitree_t *tree, bitree_node_t **parent, void *data, i
 	((avl_node_t*)((*parent)->data))->factor += AVL_LEFT_HEAVY;
 	if(((avl_node_t*)((*parent)->data))->factor > AVL_LEFT_HEAVY) {
 	  avl_rotate(parent);
+	  *balance = AVL_BALANCE;
+	} else if(((avl_node_t*)((*parent)->data))->factor == AVL_LEFT_HEAVY) {
+	  *balance = AVL_LEFT_HEAVY;
+	} else if(((avl_node_t*)((*parent)->data))->factor > AVL_BALANCE) {
 	  *balance = AVL_BALANCE;
 	}
       }
