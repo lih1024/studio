@@ -494,3 +494,61 @@ int bistree_lookup(bistree_t *tree, void *data)
   return -1;
 }
 
+//==============================heap====================================
+void heap_init(heap_t *heap, int (*compare)(void*, void*), void (*destroy)(void*))
+{
+  heap->size = 0;
+  heap->tree = NULL;
+  heap->compare = compare;
+  heap->destroy = destroy;
+}
+
+int heap_insert(heap_t *heap, void *data)
+{
+  if(heap != NULL && data != NULL) {
+    heap->tree = (void**)realloc(sizeof(void*)*(heap_size(heap)+1));
+    (heap->tree)[heap_size(heap)] = data;
+    heap->size += 1;
+    int pos, ppos;
+    void *tmp;
+    pos = heap->size - 1;
+    while(1) {
+      ppos = heap_parent(pos);
+      if(ppos == -1)
+	break;
+      if(heap->compare(data, (heap->tree)[ppos]) < 0) {
+	tmp = (heap->tree)[pos];
+	(heap->tree)[pos] = (heap->tree)[ppos];
+	(heap->tree)[ppos] = tmp;
+	pos = ppos;
+      } else {
+	break;
+      }
+    }
+  }
+}
+
+void* heap_extract(heap_t *heap)
+{
+  void *top = NULL;
+  if(heap != NULL && heap_size(heap) > 0) {
+    top = (heap->tree)[0];
+    if(heap_size(heap) == 1) {
+      heap->size = 0;
+      heap->tree = NULL;
+    } else {
+      (heap->tree)[0] = (heap->tree)[heap_size(heap)-1];
+      heap->tree = (void**)malloc(sizeof(void*)*(heap_size(heap)-1));
+      heap->size -= 1;
+      int pos, lp, rp;
+      void *tmp;
+      pos = 0;
+    }
+  }
+  return top;
+}
+
+void heap_destroy()
+{
+
+}

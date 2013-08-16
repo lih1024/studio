@@ -275,9 +275,9 @@ int main(int argc, char* argv[])
   test_table();
  
   test_tree();
- */
 
   test_bistree();
+ */
 
   return 0;
 }

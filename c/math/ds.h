@@ -105,6 +105,22 @@ int bistree_remove(bistree_t *tree, void *data);
 int bistree_lookup(bistree_t *tree, void *data);
 #define bistree_destroy(tree) (bitree_destroy(tree))
 
+//=============================heap============================================
+typedef struct heap_s {
+  int size;
+  void **tree;
+  int (*compare)(void*, void*);
+  void (*destroy)(void*);
+} heap_t;
+void heap_init(heap_t *heap, int (*compare)(void*, void*), void (*destroy)(void*));
+int heap_insert(heap_t *heap, void *data);
+void* heap_extract(heap_t *heap);
+#define heap_size(heap) (heap->size)
+#define heap_parent(pos) (((pos)+1)/2-1)
+#define heap_left(pos) (((pos)+1)*2-1)
+#define heap_right(pos) (((pos)+1)*2)
+void heap_destroy();
+
 //#ifdef __cplusplus
 //}
 //#endif
