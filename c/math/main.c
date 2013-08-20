@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "ds.h"
 
 void print_list(list_t *list)
@@ -265,6 +266,46 @@ void test_bistree()
   bistree_destroy(tree);
 }
 
+int heap_compare_callback(void *k1, void *k2)
+{
+  int *ip1 = (int*)k1;
+  int *ip2 = (int*)k2;
+  return (*ip1 - *ip2);
+}
+
+void print_heap(heap_t *heap)
+{
+  int size = heap_size(heap);
+  printf("heap(%d):\n", size);
+  int i;
+  int *ip;
+  for(i = 0; i < size; i++) {
+    ip = (int*)((heap->tree)[i]);
+    printf("%d, ", *ip);
+  }
+  printf("\n");
+}
+
+void test_heap()
+{
+  heap_t *heap = (heap_t*)malloc(sizeof(heap_t));
+  heap_init(heap, heap_compare_callback, NULL);
+  srand((int)time(0));
+  int i, len = 10;
+  int *array = (int*)malloc(sizeof(int)*len);
+  printf("random array:\n");
+  for(i = 0; i < len; i++) {
+    array[i] = rand() % 20;
+    printf("%d, ", array[i]);
+    heap_insert(heap, (void*)(&(array[i])));
+  }
+  printf("\n");
+
+  print_heap(heap);
+
+  heap_destroy(heap);
+}
+
 int main(int argc, char* argv[])
 {
   /*
@@ -277,6 +318,8 @@ int main(int argc, char* argv[])
   test_tree();
 
   test_bistree();
+
+  test_heap();
  */
 
   return 0;

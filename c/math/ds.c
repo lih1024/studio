@@ -506,7 +506,7 @@ void heap_init(heap_t *heap, int (*compare)(void*, void*), void (*destroy)(void*
 int heap_insert(heap_t *heap, void *data)
 {
   if(heap != NULL && data != NULL) {
-    heap->tree = (void**)realloc(sizeof(void*)*(heap_size(heap)+1));
+    heap->tree = (void**)realloc(heap->tree, sizeof(void*)*(heap_size(heap)+1));
     (heap->tree)[heap_size(heap)] = data;
     heap->size += 1;
     int pos, ppos;
@@ -538,11 +538,34 @@ void* heap_extract(heap_t *heap)
       heap->tree = NULL;
     } else {
       (heap->tree)[0] = (heap->tree)[heap_size(heap)-1];
-      heap->tree = (void**)malloc(sizeof(void*)*(heap_size(heap)-1));
+      heap->tree = (void**)realloc(heap->tree, sizeof(void*)*(heap_size(heap)-1));
       heap->size -= 1;
       int pos, lp, rp;
       void *tmp;
       pos = 0;
+      while(1) {
+	lp = heap_left(pos);
+	if(lp >= heap_size(heap))
+	  break;
+	if(heap->compare((heap->tree)[pos], (heap->tree)[lp]) > 0) {
+	  tmp = (heap->tree)[pos];
+	  (heap->tree)[pos] = (heap->tree)[lp];
+	  (heap->tree)[lp] = tmp;
+	  pos = lp;
+	  continue;
+	}
+	rp = heap_right(pos);
+	if(rp >= heap_size(heap))
+	  break;
+	if(heap->compare((heap->tree)[pos], (heap->tree)[rp]) > 0) {
+	  tmp = (heap->tree)[pos];
+	  (heap->tree)[pos] = (heap->tree)[rp];
+	  (heap->tree)[rp] = tmp;
+	  pos = rp;
+	  continue;
+	}
+	break;
+      }
     }
   }
   return top;
