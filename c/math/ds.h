@@ -125,4 +125,25 @@ void heap_destroy();
 //}
 //#endif
 
+//============================graph===================================
+typedef struct adjlist_s {
+  void *vertex;
+  list_t adjacent;
+} adjlist_t;
+
+typedef struct graph_s {
+  int vcount;
+  int ecount;
+  int (*match)(void*, void*);
+  void (*destroy)(void*);
+  list_t adjlists;
+} graph_t;
+
+void graph_init(graph_t *graph, int (*math)(void*, void*), void (*destroy)(void*));
+int graph_ins_vertex(graph_t *graph, void *data);
+int graph_rem_vertex(graph_t *graph, void *data);
+int graph_ins_edge(graph_t *graph, void *data1, void *data2);
+int graph_rem_edge(graph_t *graph, void *data1, void *data2);
+void graph_destroy(graph_t *graph);
+
 #endif

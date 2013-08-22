@@ -575,3 +575,35 @@ void heap_destroy()
 {
 
 }
+
+//=============================================graph========================================
+void graph_init(graph_t *graph, int (*math)(void*, void*), void (*destroy)(void*))
+{
+
+}
+
+int graph_ins_vertex(graph_t *graph, void *data)
+{
+
+}
+
+int graph_rem_vertex(graph_t *graph, void *data)
+{
+
+}
+
+int graph_ins_edge(graph_t *graph, void *data1, void *data2)
+{
+
+}
+
+int graph_rem_edge(graph_t *graph, void *data1, void *data2)
+{
+
+}
+
+void graph_destroy(graph_t *graph)
+{
+
+}
+
